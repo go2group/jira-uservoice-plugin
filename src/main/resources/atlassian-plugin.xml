@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/jira-uservoice-plugin-2.png</param>
+    <param name="plugin-logo">images/jira-uservoice-plugin-2.png</param>
+    <param name="plugin-banner">images/banner-jira-uservoice-plugin.png</param>
+    <param name="vendor-icon">images/g2gicon.jpg</param>
+    <param name="vendor-logo">images/g2glogo.jpg</param>
+    <param name="configure.url">/secure/admin/ConfigureUserVoice!default.jspa</param>
+  </plugin-info>
+  <resource type="i18n" name="i18n" location="atlassian-plugin"/>
+  <web-resource key="uv-resources" name="UV Resources">
+    <resource name="images/" type="download" location="includes/images"/>
+  </web-resource>
+  <web-item name="UserVoice Configuration" i18n-name-key="user-voice-configuration.name" key="configure-item" section="admin_plugins_menu/integrations_section" weight="1000">
+    <description key="user-voice-configuration.description">Configurations for Uservoice Intergration</description>
+    <label key="user-voice-configuration.label"/>
+    <link linkId="user-voice-configuration-link">/secure/admin/ConfigureUserVoice!default.jspa</link>
+    <tooltip key="user-voice-configuration.tooltip"/>
+  </web-item>
+  <issue-link-renderer key="feedback-renderer" application-type="Uservoice" class="com.go2group.renderer.FeedbackRenderer">
+    <resource name="initial-view" type="velocity" location="templates/renderers/feedback-renderer.vm"/>
+    <resource name="final-view" type="velocity" location="templates/renderers/feedback-renderer.vm"/>
+  </issue-link-renderer>
+  <webwork1 key="configure-action" name="Configure Action" i18n-name-key="configure-action.name">
+    <description key="configure-action.description">Configure Uservoice Integration</description>
+    <actions>
+      <action name="com.go2group.jira.webwork.ConfigureUserVoice" alias="ConfigureUserVoice">
+        <view name="input">/templates/config/configure-input.vm</view>
+        <view name="error">/templates/config/configure-input.vm</view>
+        <view name="securitybreach">/secure/views/securitybreach.jsp</view>
+        <view name="license">/templates/licenserequired.vm</view>
+      </action>
+    </actions>
+  </webwork1>
+  <webwork1 key="map-forums-action" name="Map Forums Action" i18n-name-key="map-forums-action.name">
+    <description key="map-forums-action.description">Map UserVoice with JIRA Projects</description>
+    <actions>
+      <action name="com.go2group.jira.webwork.MapForums" alias="MapForums">
+        <view name="input">/templates/config/map-input.vm</view>
+        <view name="error">/templates/config/map-input-error.vm</view>
+        <view name="success">/templates/config/map-input.vm</view>
+        <command name="ticketMapping" alias="TicketMapping">
+          <view name="input">/templates/config/map-input.vm</view>
+          <view name="error">/templates/config/map-input-error.vm</view>
+          <view name="success">/templates/config/map-input.vm</view>
+        </command>
+      </action>
+    </actions>
+  </webwork1>
+  <webwork1 key="configure-mapping-action" name="Configure Mapping Action" i18n-name-key="configure-mapping-action.name">
+    <description key="configure-mapping-action.description">Configure the selected mapping</description>
+    <actions>
+      <action name="com.go2group.jira.webwork.ConfigureMapping" alias="ConfigureMapping">
+        <view name="input">/templates/config/configure-mapping.vm</view>
+        <view name="success">/templates/config/configure-mapping.vm</view>
+      </action>
+    </actions>
+  </webwork1>
+  <component key="uservoice-manager" name="UserVoice Manager" class="com.go2group.uservoice.manager.impl.UserVoiceManagerImpl">
+    <interface>com.go2group.uservoice.manager.UserVoiceManager</interface>
+  </component>
+  <component key="g2g-manager" name="G2G Manager" class="com.go2group.manager.G2GManagerImpl" public="true">
+    <interface>com.go2group.manager.G2GManager</interface>
+  </component>
+  <ao key="ao-module">
+    <description>The configuration of the Active Objects service</description>
+    <entity>com.go2group.entity.UserVoiceConfig</entity>
+    <entity>com.go2group.entity.Mapping</entity>
+    <entity>com.go2group.entity.FeedbackMapping</entity>
+    <entity>com.go2group.entity.CommentMapping</entity>
+    <entity>com.go2group.entity.FbStatusMap</entity>
+    <entity>com.go2group.entity.TicketStatusMap</entity>
+    <entity>com.go2group.entity.MappingConfig</entity>
+    <entity>com.go2group.entity.TicketMapping</entity>
+    <entity>com.go2group.entity.TickMappingConf</entity>
+    <entity>com.go2group.entity.IssueTicket</entity>
+    <entity>com.go2group.entity.MessageMapping</entity>
+    <entity>com.go2group.entity.TktCustomFieldMap</entity>
+    <entity>com.go2group.entity.UVTicketFilter</entity>
+  </ao>
+  <component-import key="ao" name="Active Objects components" interface="com.atlassian.activeobjects.external.ActiveObjects">
+    <description>Access to the Active Objects service</description>
+  </component-import>
+  <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher"/>
+  <component key="eventListener" class="com.go2group.listener.UserVoiceListener">
+    <description>Listens JIRA issue events and updates Uservoice.</description>
+  </component>
+  <!-- SAL Scheduler for Uservoice Service -->
+  <component-import key="pluginScheduler">
+    <description>SAL Scheduler</description>
+    <interface>com.atlassian.sal.api.scheduling.PluginScheduler</interface>
+  </component-import>
+  <component key="userVoiceScheduler" class="com.go2group.services.UserVoiceServiceImpl" system="true" public="true">
+    <description>The plugin component that schedules the Uservoice Service.</description>
+    <interface>com.atlassian.sal.api.lifecycle.LifecycleAware</interface>
+    <interface>com.go2group.services.UserVoiceServiceMonitor</interface>
+  </component>
+  <!-- Licensing support -->
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+  <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
+  <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
+  <component-import key="txTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
+  <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
+  <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+  <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
+  <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+  <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
+  <component-import key="pluginLicenseManager" interface="com.atlassian.upm.api.license.PluginLicenseManager"/>
+  
+  <webwork1 key="configure-ticket-mapping-webwork-module" name="Configure Ticket Mapping Webwork Module" i18n-name-key="configure-ticket-mapping-webwork-module.name">
+    <description key="configure-ticket-mapping-webwork-module.description">The Configure Ticket Mapping Webwork Module Plugin</description>
+    <actions>
+      <action name="com.go2group.jira.webwork.ConfigureTicketMapping" alias="ConfigureTicketMapping">
+        <view name="input">/templates/configure-ticket-mapping-webwork-module/input.vm</view>
+        <view name="success">/templates/configure-ticket-mapping-webwork-module/input.vm</view>
+      </action>
+    </actions>
+  </webwork1>
+</atlassian-plugin>

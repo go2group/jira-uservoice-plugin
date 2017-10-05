@@ -1,0 +1,115 @@
+<html>
+	<head>
+		<title>$i18n.getText("map.forums")</title>
+	</head>
+	<body>
+		#if ($hasErrorMessages)
+	    	<div class="formErrors">
+	        	<div class="errorArea">
+	            	<h4>$i18n.getText("errors.text")</h4>
+	            </div>
+		        <ul>
+		        	#foreach( $message in $errorMessages )
+		        		<li>$message</li>
+		        	#end
+		        </ul>
+	        </div>
+	    #end
+	    #if ($success)
+			<div class="aui-message success">
+                <p class="title">
+                    <span class="aui-icon icon-success"></span>
+                    <strong>Success!</strong>
+                </p>
+                <p>$i18n.getText("config.success.mapping.message")</p>
+            </div>
+		#end
+	    #set ($issuetypeCache = $issuetypes)
+	        <form action="$requestContext.baseUrl/secure/admin/ConfigureUserVoice!default.jspa?reconfigure=true" method="POST">
+	            <button class="aui-button">$i18n.getText("map.forums.reconfigure")</button>
+	        </form>
+	    <hr />
+		<form id="mappingForm" method="POST" action="$requestContext.baseUrl/secure/admin/MapForums.jspa" class="aui">
+			<h4>UserVoice Feedback Configuration</h4>
+			<p>
+			#parse( "/templates/config/feedback_add_new_mapping.vm" )
+			#parse( "/templates/config/feedback_mapping.vm" )
+			</p>
+		</form>
+		<script type="text/javascript">
+		 	AJS.$("#addMapping").click(function() {
+		 		var rowNo = AJS.$('#mapping tr').length + 1;
+		 		var jiraProj = AJS.$("#project option:selected").text()+' ('+AJS.$("#project option:selected").val()+') ';
+		 		var uvForum = AJS.$("#forum option:selected").text()+' ('+AJS.$("#forum option:selected").val()+') ';
+		 		var newRow = '<tr id="mappingRowNumber_'+rowNo+'"><td>'+jiraProj+'</td><td><select class="select">';
+		 		AJS.$("#issuetype > option").each(function() {
+				    newRow = newRow + '<option value="'+this.value+'">'+this.text+'</option>';
+				});
+		 		newRow = newRow + '</select></td>';
+		 		newRow = newRow + '<td>'+uvForum+'</td><td><select class="select"><option value="Feedback">Feedback</option></select></td>';
+		 		newRow = newRow + '<td><input class="text" type="text" name="allowedStatus" id="allowedStatus" size="70"/></td>';
+		 		newRow = newRow + '<td><input type="checkbox" name="syncPriorEntities" id="syncPriorEntities" value="Yes" /></td>';
+		 		newRow = newRow + '<td><span class="aui-button" onClick="removeMappingRow('+rowNo+');">Remove</span></td><td></td></tr>';
+		 		AJS.$('#mapping').append(newRow);
+			});
+            function removeMappingRow(rowId){
+                AJS.$("#mappingRowNumber_"+rowId).remove();
+			}
+			AJS.$("#save_btn").click(function() {
+				var jsonString = AJS.$('#mapping tbody tr').map(function() {
+					var row = AJS.$(this);
+					return {
+					    jiraProject: row.find('td:eq(0)').text(),
+					    jiraIssueType: row.find('td:eq(1)').find('select').val(),
+					    uvForum: row.find('td:eq(2)').text(),
+					    uvType: row.find('td:eq(3)').find('select').val(),
+					    allowedStatus: row.find('td:eq(4)').find('input').val(),
+					    syncPriorEntities: row.find('td:eq(5)').find("input[type='checkbox']").attr("checked") ? true : false,
+					    id: row.find('td:eq(7)').attr('id')
+					  };
+					}).get();
+				AJS.$("#jsonMapping").val(JSON.stringify(jsonString));
+				AJS.$("#mappingForm").submit();
+			});
+		</script>
+        <hr />
+		<form id="ticketMappingForm" method="POST" action="$requestContext.baseUrl/secure/admin/TicketMapping.jspa" class="aui">
+        	<h4>UserVoice Ticket Configuration</h4>
+        	<p>
+        	#parse( "/templates/config/ticket_add_new_mapping.vm" )
+        	#parse( "/templates/config/ticket_mapping.vm" )
+        	</p>
+        </form>
+        <script type="text/javascript">
+        		 	AJS.$("#addTicketMapping").click(function() {
+        		 		var rowNo = AJS.$('#ticketMapping tr').length + 1;
+        		 		var jiraProj = AJS.$("#ticketProject option:selected").text()+' ('+AJS.$("#ticketProject option:selected").val()+') ';
+        		 		var newRow = '<tr id="ticketMappingRowNumber_'+rowNo+'"><td>'+jiraProj+'</td><td><select class="select">';
+        		 		AJS.$("#issuetype > option").each(function() {
+        				    newRow = newRow + '<option value="'+this.value+'">'+this.text+'</option>';
+        				});
+        		 		newRow = newRow + '</select></td>';
+        		 		newRow = newRow + '<td>$i18n.getText("uv.ticket")</td>';
+        		 		newRow = newRow + '<td><input type="checkbox" name="syncPriorEntities" id="syncPriorEntities" value="Yes" /></td>';
+        		 		newRow = newRow + '<td><span class="aui-button" onClick="removeTicketMappingRow('+rowNo+');">Remove</span></td><td></td></tr>';
+        		 		AJS.$('#ticketMapping').append(newRow);
+        			});
+                    function removeTicketMappingRow(rowId){
+                        AJS.$("#ticketMappingRowNumber_"+rowId).remove();
+        			}
+        			AJS.$("#ticketsave_btn").click(function() {
+        				var jsonString = AJS.$('#ticketMapping tbody tr').map(function() {
+        					var row = AJS.$(this);
+        					return {
+        					    jiraProject: row.find('td:eq(0)').text(),
+        					    jiraIssueType: row.find('td:eq(1)').find('select').val(),
+        					    syncPriorEntities: row.find('td:eq(3)').find("input[type='checkbox']").attr("checked") ? true : false,
+        					    id: row.find('td:eq(5)').attr('id')
+        					  };
+        					}).get();
+        				AJS.$("#ticketJsonMapping").val(JSON.stringify(jsonString));
+        				AJS.$("#ticketMappingForm").submit();
+        			});
+        		</script>
+	</body>
+</html>         

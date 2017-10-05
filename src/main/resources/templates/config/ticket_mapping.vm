@@ -1,0 +1,50 @@
+<table class="aui" id="ticketMapping">
+						<thead>
+							<tr>
+								<th>$i18n.getText("jira.project")</th>
+								<th>$i18n.getText("jira.issuetype")</th>
+								<th>$i18n.getText("uv.ticket")</th>
+								<th>$i18n.getText("sync.prior.entities")</th>
+								<th></th>
+								<th></th>
+							<tr>
+						</thead>
+						<tbody>
+							#foreach($mapping in $ticketMappings)
+								<tr id="ticketMappingRowNumber_$velocityCount">
+									<td>$mapping.jiraProject</td>
+									<td>
+										<select class="select">
+											#foreach($issuetype in $issuetypeCache)
+												<option value="$issuetype.id" #if($issuetype.getId().toString().equals($mapping.getJiraIssueType())) selected #end>$issuetype.name</option>
+											#end
+										</select>
+									</td>
+									<td>$i18n.getText("uv.ticket")</td>
+                                    <td>
+                                        <input type="checkbox" name="syncPriorEntities" id="syncPriorEntities" #if($action.isSyncPriorEntities($mapping)) checked #end value="Yes" />
+									</td>
+                                    <td>
+									    <span class="aui-button" onClick="removeTicketMappingRow($velocityCount);">Remove</span>
+									</td>
+                                    <td id="$mapping.ID">
+										<a class="cancel" title="$i18n.getText("configure.mapping.description")" href="$requestContext.baseUrl/secure/admin/ConfigureTicketMapping!default.jspa?id=$mapping.ID">
+										#if(!$action.isTicketConfigured($mapping))
+                                        	<span class="aui-icon aui-icon-error" title="Mapping not configured yet">Error</span>
+                                        #end
+										$i18n.getText("configure.mapping")
+										</a>
+									</td>
+								</tr>
+							#end
+						</tbody>
+					</table>
+
+					<div class="buttons-container form-footer">
+                    				<div class="buttons">
+                    					<input id="ticketsave_btn" class="aui-button aui-button-primary" type="button" value="$i18n.getText("map.forums.save")">
+                    				</div>
+                    			</div>
+                    			<input type="hidden" name="ticketJsonMapping" id="ticketJsonMapping"/>
+
+

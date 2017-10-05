@@ -1,0 +1,39 @@
+					<h2>$i18n.getText("config.label.status.value.mapping")</h2>
+					<table class="aui" id="status-mapping">
+						<thead>
+							<tr>
+								<th>$i18n.getText("uv.label.status")</th>
+								<th>$i18n.getText("jira.label.status")</th>
+							<tr>
+						</thead>
+						<tbody>
+							#if($statusMappingVOs)
+								#foreach($mapping in $statusMappingVOs)
+									<tr id="$action.getId()">
+										<td id="$mapping.getUvStatusId()">$mapping.userVoiceStatus</td>
+										<td>
+											<select class="select" name="$mapping.userVoiceStatus">
+												#foreach($jiraStatus in $jiraStatuses)
+													<option value="$jiraStatus.id" #if($jiraStatus.getId().toString().equals($mapping.getJiraStatusId())) selected #end>$jiraStatus.name</option>
+												#end
+											</select>
+										</td>
+									</tr>
+								#end
+							#else
+								#foreach($status in $feedbackStatuses)
+									<tr id="$action.getId()">
+										<td id="$status.getId()">$status.name</td>
+										<td>
+											<select class="select" name="$status.name">
+												#foreach($jiraStatus in $jiraStatuses)
+													<option value="$jiraStatus.id">$jiraStatus.name</option>
+												#end
+											</select>
+										</td>
+									</tr>
+								#end
+							#end
+						</tbody>
+					</table>
+					<input type="hidden" name="jsonFBSMapping" id="jsonFBSMapping"/>

@@ -1,0 +1,209 @@
+					<br>
+					<hr>
+					<h1>$i18n.getText("uv.ticket.cf.title")</h1>
+					<h2>$i18n.getText("uv.ticket.cf.available")</h2>
+					<table class="aui">
+						<tbody>
+							<tr id="$action.getId()">
+								<td>$i18n.getText("uv.ticket.cf.field")
+									<select id="uvcf" class="select" name="uvcf">
+										<option value="satisfaction_rating">User Satisfaction Rating</option>
+										#foreach($customField in $uvCustomFields)
+											<option value="$customField.getId()">$customField.name</option>
+										#end
+									</select>
+									<span style="padding-left:25px">
+									$i18n.getText("uv.ticket.cf.jira")
+									<select id="jiracf" class="select" name="jiracf">
+										#foreach($jiraCF in $jiraCustomFields)
+											<option value="$jiraCF.id">$jiraCF.name</option>
+										#end
+									</select>
+									<span style="padding-left:15px">
+									<input class="aui-button aui-button-primary" id="add_btn" class="button" type="button" value="Add" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<h2>$i18n.getText("uv.ticket.cf.mapping")</h2>
+					<table class="aui" id="tkt-custom-field-mapping">
+						<thead>
+							<tr>
+								<th>$i18n.getText("uv.ticket.cf.uvfield")</th>
+								<th>$i18n.getText("uv.ticket.cf.jirafield")</th>
+								<th>$i18n.getText("uv.ticket.cf.action")</th>
+							<tr>
+						</thead>
+						<tbody id="$action.getId()">
+							#if($uvCFMappingVOs)
+								#foreach($mapping in $uvCFMappingVOs)
+									<tr id="$mapping.getUvCustomFieldId()_$mapping.getJiraCustomFieldId()">
+										<td id="$mapping.getUvCustomFieldId()">$mapping.uvCustomFieldName</td>
+										<td id="$mapping.getJiraCustomFieldId()">$mapping.jiraCustomFieldName</td>
+										<td>
+											<spam class="del_btn">
+												<input class="aui-button" id="$mapping.getUvCustomFieldId()" type="button" value="Delete" onclick="deleteRow('$mapping.getUvCustomFieldId()','$mapping.getJiraCustomFieldId()')" />
+											</spam>
+										</td>
+									</tr>
+								#end
+							#end
+						</tbody>
+					</table>
+					<br>
+					<hr>
+					<h1>$i18n.getText("uv.ticket.filter.title")</h1>
+					#set($uvFilterVO = $action.getUvFilterVO())
+					#if($uvFilterVO.getFilterOption() == 'true')
+						<span style="padding-left:15px"><input id="filterOptionCheckbox" type="checkbox" checked="true">$i18n.getText("uv.ticket.filter.option")
+						<div id="filtersection" style="display:block">
+					#else
+						<span style="padding-left:15px"><input id="filterOptionCheckbox" type="checkbox">$i18n.getText("uv.ticket.filter.option")
+						<div id="filtersection" style="display:none">
+					#end
+						<table class="aui" >
+							<thead>
+								<tr>
+									<th style="text-align:center">$i18n.getText("uv.ticket.filter.head.fields")</th>
+									<th>&nbsp;</th>
+									<th style="text-align:center">$i18n.getText("uv.ticket.filter.head.condition")</th>
+									<th>&nbsp;</th>
+									<th style="text-align:center">$i18n.getText("uv.ticket.filter.head.filter")</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td style="text-align:center;vertical-align:middle">
+										<select id="uvfields" size="10">
+										#foreach($uvFilterField in $uvFilterVO.getUvFilterFields())
+											<option value='$uvFilterField.getId()'>$uvFilterField.getName()</option>
+										#end
+										</select>
+									</td>
+									<td  style="text-align:center;vertical-align:middle"><input id="condition" type="button" value="Add to condition ->" /></td>
+									<td  style="text-align:center;vertical-align:middle">
+										<div><span style="padding-left:50px"><label for="cond">Field</label></span><span style="padding-left:5px"><input id="uvcond" type="text" readonly="true"/></div>
+										<br>
+										<div><span style="padding-left:48px"><label for="value">Value</label></span><span style="padding-left:5px"><input id="uvvalue" type="text"/></div>
+									</td>
+									<td  style="text-align:center;vertical-align:middle"><input id="filter-button" type="button" value="Add to filter ->"></td>
+									#if($uvFilterVO.getFilter())
+										<td  style="text-align:center;vertical-align:middle"><textarea id="filter" rows="10" cols="50">$uvFilterVO.getFilter()</textarea></td>
+									#else
+										<td  style="text-align:center;vertical-align:middle"><textarea id="filter" rows="10" cols="50"></textarea></td>
+									#end
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<input type="hidden" name="jsonTktCFMapping" id="jsonTktCFMapping"/>
+					<input type="hidden" name="jsonTktFilter" id="jsonTktFilter"/>
+					<input type="hidden" name="filterOption" id="filterOption"/>
+					<script type="text/javascript">
+						AJS.$("#add_btn").click(function() {
+							var uvCFId = AJS.$("#uvcf").attr('value');
+							var uvCFName = AJS.$("#uvcf").find('option:selected').text();
+							
+							var jiraCFId = AJS.$("#jiracf").attr('value');
+							var jiraCFName = AJS.$("#jiracf").find('option:selected').text();
+							
+							if(jiraCFName){
+								var alreadyAdded="false";
+							
+								AJS.$('#tkt-custom-field-mapping > tbody  > tr').each(function() {
+									var row = AJS.$(this);
+									var uvcfid = row.find('td:eq(0)').attr('id'); 
+									var uvcfname = row.find('td:eq(0)').text();
+									var jiracfid = row.find('td:eq(1)').attr('id');
+									var jiracfname = row.find('td:eq(1)').text();
+								
+									var jqid="#" + uvcfid + "_" + jiracfid;
+									var btntext = AJS.$(jqid).find('td:eq(2)').find('input[type=button]').attr('value');
+									
+									if(uvCFId == uvcfid){
+										alreadyAdded="true";
+										row.find('td:eq(0)').css('background-color', 'white');
+										row.find('td:eq(0)').css('color', 'black');
+										
+										row.find('td:eq(1)').attr('id',jiraCFId);
+										row.find('td:eq(1)').text(jiraCFName);
+										
+										row.find('td:eq(1)').css('background-color', 'white');
+										row.find('td:eq(1)').css('color', 'black');
+										
+										row.find('td:eq(2)').find('input[type=button]').attr('value', 'Delete');
+										row.find('td:eq(2)').css('background-color', 'white');
+										row.find('td:eq(2)').css('color', 'black');
+										
+										return;
+									}
+								});
+								
+								if(alreadyAdded == "false"){
+									AJS.$("#tkt-custom-field-mapping tbody").append(
+										"<tr id=" + uvCFId + "_" + jiraCFId + ">" + 
+											"<td id=" + uvCFId + ">" + uvCFName + "</td>" +
+											"<td id=" + jiraCFId + ">" + jiraCFName + "</td>" +
+											"<td><spam class='del_btn'>" +
+													"<input class='aui-button' id=" + uvCFId + " type='button' value='Delete' onclick='deleteRow(\"" + uvCFId + "\",\"" + jiraCFId + "\")' />" +
+												"</spam>" +
+											"</td></tr> "
+									);
+								}
+							}
+						});
+						
+						function deleteRow(uvCFId, jiraCFId){
+							rowId = uvCFId + "_" + jiraCFId;
+							var jqid="#" + rowId;
+							var btntext = AJS.$(jqid).find('td:eq(2)').find('input[type=button]').attr('value');
+							
+							if(btntext == "Delete"){
+								AJS.$(jqid).find('td:eq(0)').css('background-color', '#F0F0F0');
+								AJS.$(jqid).find('td:eq(0)').css('color', 'white');
+								
+								AJS.$(jqid).find('td:eq(1)').css('background-color', '#F0F0F0');
+								AJS.$(jqid).find('td:eq(1)').css('color', 'white');
+								
+								AJS.$(jqid).find('td:eq(2)').css('background-color', '#F0F0F0');
+								AJS.$(jqid).find('td:eq(2)').css('color', 'white');
+								
+								AJS.$(jqid).find('td:eq(2)').find('.del_btn').html("<input class='aui-button' id=" + uvCFId + " type='button' value='Undo' onclick='deleteRow(\"" + uvCFId + "\",\"" + jiraCFId + "\")' />");
+							}else{
+								AJS.$(jqid).find('td:eq(0)').css('background-color', 'white');
+								AJS.$(jqid).find('td:eq(0)').css('color', 'black');
+								
+								AJS.$(jqid).find('td:eq(1)').css('background-color', 'white');
+								AJS.$(jqid).find('td:eq(1)').css('color', 'black');
+								
+								AJS.$(jqid).find('td:eq(2)').css('background-color', 'white');
+								AJS.$(jqid).find('td:eq(2)').css('color', 'black');
+								
+								AJS.$(jqid).find('td:eq(2)').find('.del_btn').html("<input class='aui-button' id=" + uvCFId + " type='button' value='Delete' onclick='deleteRow(\"" + uvCFId + "\",\"" + jiraCFId + "\")' />");
+							}
+						};
+						
+						AJS.$("#condition").click(function() {
+							var cond= AJS.$("#uvfields").find('option:selected').val();
+							AJS.$("#uvcond").val(cond);
+						});
+						
+						AJS.$("#filter-button").click(function() {
+							var fName=AJS.$("#uvcond").val();
+							if(fName.indexOf(' ') >= 0){
+								fName='"' + fName + '"';
+							}
+							var fValue=AJS.$("#uvvalue").val();
+							if(fValue.indexOf(' ') >= 0){
+								fValue='"' + fValue + '"';
+							}
+							var filter= fName + ":" + fValue + ";\n";
+							AJS.$("#filter").val(AJS.$("#filter").val() + filter);
+							AJS.$("#uvcond").val("");
+							AJS.$("#uvvalue").val("");
+						});
+						
+						AJS.$("#filterOptionCheckbox").click(function(){
+							AJS.$("#filtersection").toggle(this.checked);
+						});
+					</script>

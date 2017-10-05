@@ -1,0 +1,51 @@
+#* @vtlmacrolibrary path="../../../../../../../jira-core/src/main/resources/templates/plugins/jira/issuelinks/macros.vm" *#
+#* @vtlvariable name="noApplinkAuthConfigured" type="java.lang.Boolean" *#
+#* @vtlvariable name="applicationUrl" type="java.net.URI" *#
+#* @vtlvariable name="appLinkId" type="com.atlassian.applinks.api.ApplicationId" *#
+#* @vtlvariable name="id" type="java.lang.Long" *#
+#* @vtlvariable name="statusIconTooltip" type="java.lang.String" *#
+#* @vtlvariable name="statusIconLink" type="java.lang.String" *#
+#* @vtlvariable name="statusIconUrl" type="java.lang.String" *#
+#* @vtlvariable name="summary" type="java.lang.String" *#
+#* @vtlvariable name="title" type="java.lang.String" *#
+#* @vtlvariable name="resolved" type="java.lang.Boolean" *#
+#* @vtlvariable name="url" type="java.lang.String" *#
+#* @vtlvariable name="tooltip" type="java.lang.String" *#
+#* @vtlvariable name="iconTooltip" type="java.lang.String" *#
+#* @vtlvariable name="iconUrl" type="java.lang.String" *#
+#* @vtlvariable name="authenticationRequired" type="java.lang.Boolean" *#
+#* @vtlvariable name="permissionDenied" type="java.lang.Boolean" *#
+#* @vtlvariable name="authenticationUrl" type="java.lang.String" *#
+#* @vtlvariable name="applicationName" type="java.lang.String" *#
+#* @vtlvariable name="i18n" type="com.atlassian.jira.action.JiraActionSupport" *#
+#* @vtlvariable name="textutils" type="com.opensymphony.util.TextUtils" *#
+<p>
+    #renderIssueLinkIcon(${iconUrl} ${iconTooltip} ${iconTooltip} ${textutils})
+    <span title="#if($newtooltip)${textutils.htmlEncode($newtooltip)}#else${textutils.htmlEncode($tooltip)}#end">
+        <a href="${url}" class="link-title">#if($newtitle)${textutils.htmlEncode($newtitle)}#else${textutils.htmlEncode($title)}#end</a> <span class="link-summary">${textutils.htmlEncode($!summary)}</span>
+    </span>
+    #if ($votes) - 
+    <span title="$votes Votes">
+    	<span class="votes">$i18n.getText("vote.text"): <b>$!votes</b></span>
+    </span>
+    #end
+    #if ($state) - 
+    <span title="State: $state.toUpperCase()">
+    	<span class="state">$i18n.getText("state.text"): <b>$state.toUpperCase()</b></span>
+    </span>
+    #end
+    #if ($status) - 
+    <span title="Status: $status.toUpperCase()">
+    	<span class="status">$i18n.getText("status.text"): <b>$status.toUpperCase()</b></span>
+    </span>
+    #end
+</p>
+<ul class="link-snapshot">
+    #if (${statusIconUrl})
+        #if (${statusIconLink})
+        <li class="status"><a href="${statusIconLink}" >#renderIssueLinkIcon(${statusIconUrl} ${statusIconTooltip} ${statusIconTooltip} ${textutils})</a></li>
+        #else
+        <li class="status">#renderIssueLinkIcon(${statusIconUrl} ${statusIconTooltip} ${statusIconTooltip} ${textutils})</li>
+        #end
+    #end
+</ul>

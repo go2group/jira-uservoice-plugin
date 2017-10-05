@@ -1,0 +1,96 @@
+<html>
+	<head>
+		<title>$i18n.getText("uv.configuration")</title>
+	</head>
+	<body>
+		#if ($hasErrorMessages)
+	    	<div class="aui-message error">
+                <p class="title">
+                    <span class="aui-icon icon-error"></span>
+                    <strong>$i18n.getText("errors.text")</strong>
+                </p>
+	        	<ul>
+		        	#foreach( $message in $errorMessages )
+		        		<li>$message</li>
+		        	#end
+		        </ul>
+	        </div>
+	    #end
+		<form method="POST" action="$requestContext.baseUrl/secure/admin/ConfigureUserVoice.jspa" class="aui">
+			<h2>$i18n.getText("uv.configuration")</h2>
+
+			## Bhushan: 09/25/2013
+			## Display a message is unassigned issues is turned of
+			#if(!$allowUnassigned)
+			    <div class="aui-message warning">
+                    <p class="title">
+                        <span class="aui-icon icon-warning"></span>
+                        <strong>Unassigned issues is turned off</strong>
+                    </p>
+                    <p>Unassigned issues is turned off. Please make sure that your project has a project lead set. The plugin will assign all issues to the project lead.</p>
+			    </div>
+			#end
+			##End of code added by Bhushan on 09/25/2013
+
+            <div class="aui-message hint">
+                <p class="title">
+                    <span class="aui-icon icon-hint "></span>
+
+                    <strong>How to configure JIRA on Uservoice?</strong>
+                </p>
+                <p>
+                    <ol>
+                        <li>Login to Uservoice administration console</li>
+                        <li>Click on Settings and select Integration</li>
+                        <li>Click on Uservoice API and select Add API Client</li>
+                        <li>Enter a name and make sure "Trusted Application" is checked</li>
+                        <li>Click on Register</li>
+                    </ol>
+                </p>
+            </div>
+
+			<fieldset>
+				<div class="field-group">
+					<label>$i18n.getText("jira.admin")<span class="aui-icon icon-required"> required</span></label>
+					<span class="field-value">
+						<select class="select" name="jiraAdmin" id="jiraAdmin">
+							#foreach($admin in $admins)
+								<option value="$admin.name" #if($admin.name.equals($jiraAdmin)) selected #end>$admin.displayName</option>
+							#end
+						</select>
+					</span>
+					<div class="description">$i18n.getText("jira.admin.description")</div>
+				</div>
+				<div class="field-group">
+					<label>$i18n.getText("uv.baseurl")<span class="aui-icon icon-required"> required</span></label>
+					<span class="field-value"><input class="text" type="text" name="userVoiceUrl" #if ($userVoiceUrl) value="$userVoiceUrl" #end/></span>
+					<div class="description">$i18n.getText("uv.baseurl.description")</div>
+				</div>
+				<div class="field-group">
+					<label>$i18n.getText("uv.admin")<span class="aui-icon icon-required"> required</span></label>
+					<span class="field-value"><input class="text" type="text" name="userVoiceAdmin" #if ($userVoiceAdmin) value="$userVoiceAdmin" #end/></span>
+					<div class="description">$i18n.getText("uv.admin.description")</div>
+				</div>
+				<div class="field-group">
+					<label>$i18n.getText("uv.consumer.key")<span class="aui-icon icon-required"> required</span></label>
+					<span class="field-value"><input class="text" type="text" name="consumerKey" #if ($consumerKey) value="$consumerKey" #end/></span>
+					<div class="description">$i18n.getText("uv.consumer.key.description")</div>
+				</div>
+				<div class="field-group">
+					<label>$i18n.getText("uv.shared.secret")<span class="aui-icon icon-required"> required</span></label>
+					<span class="field-value"><input class="text" type="text" name="sharedSecret" #if ($sharedSecret) value="$sharedSecret" #end/></span>
+					<div class="description">$i18n.getText("uv.shared.secret.description")</div>
+				</div>
+			</fieldset>
+
+			<div class="buttons-container form-footer">
+				<div class="buttons">
+					<input  class="aui-button aui-button-primary" id="config_btn" class="button submit" type="submit" value="$i18n.getText("configure.save")">
+					#if($reconfigure)
+						<a class="cancel" title="$i18n.getText("configure.skip.description")" href="$requestContext.baseUrl/secure/admin/MapForums!default.jspa">$i18n.getText("configure.skip")</a>
+					#end
+				</div>
+			</div>
+		</form>
+	</body>
+</html>         

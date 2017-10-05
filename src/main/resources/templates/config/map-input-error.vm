@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>$i18n.getText("map.forums")</title>
+	</head>
+	<body>
+	    #if ($hasErrorMessages)
+            <div class="aui-message error">
+                <p class="title">
+                    <span class="aui-icon icon-error"></span>
+                    <strong>$i18n.getText("errors.text")</strong>
+                </p>
+		        <ul>
+		        	#foreach( $message in $errorMessages )
+		        		<li>$message</li>
+		        	#end
+		        </ul>
+	        </div>
+	    #end
+	</body>
+</html>

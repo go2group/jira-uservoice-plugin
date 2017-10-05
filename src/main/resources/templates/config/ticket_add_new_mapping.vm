@@ -1,0 +1,18 @@
+<table>
+						    <tbody>
+						        <tr>
+						            <td>Project</td>
+						            <td>
+						            	<select class="select" name="ticketProject" id="ticketProject">
+											#foreach($project in $projects)
+												<option value="$project.id">$project.name</option>
+											#end
+										</select>
+						            </td>
+						            <td>
+										<span class="aui-button" id="addTicketMapping">Add</span>
+									</span>
+						            </td>
+						        </tr>
+						    </tbody>
+						</table>

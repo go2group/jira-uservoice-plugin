@@ -1,0 +1,18 @@
+<html>
+<head>
+ <title>Go2Group Uservoice Plugin: License Required</title>
+</head>
+<body>
+<div class="aui-message error">
+    <p class="title">
+        <span class="aui-icon icon-error"></span>
+        <strong>Invalid license</strong>
+    </p>
+    <ul>
+        #foreach( $message in $errorMessages )
+	        <li>$message</li>
+	    #end
+	</ul>
+</div>
+</body>
+</html>

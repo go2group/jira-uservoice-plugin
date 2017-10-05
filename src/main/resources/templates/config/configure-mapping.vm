@@ -1,0 +1,72 @@
+<html>
+	<head>
+		<title>$i18n.getText("mapping.configuration")</title>
+	</head>
+	<body>
+		#if ($hasErrorMessages)
+	    	<div class="aui-message error">
+                <p class="title">
+                    <span class="aui-icon icon-error"></span>
+                    <strong>$i18n.getText("errors.text")</strong>
+                </p>
+	        	<ul>
+		        	#foreach( $message in $errorMessages )
+		        		<li>$message</li>
+		        	#end
+		        </ul>
+	        </div>
+	    #end
+	    #if ($success)
+			<div class="aui-message success">
+                <p class="title">
+
+                    <span class="aui-icon icon-success"></span>
+                    <strong>Success!</strong>
+                </p>
+                <p>$i18n.getText("config.success.message")</p>
+            </div>
+		#end
+		<form name="fbMappingForm" id="fbMappingForm" method="POST" action="$requestContext.baseUrl/secure/admin/ConfigureMapping.jspa" class="aui">
+			<h2>$i18n.getText("configure.mapping")</h2>
+			<fieldset>
+				<div class="field-group">
+					<label>$i18n.getText("allowed.status")</label>
+					<span class="field-value"><input class="text" type="text" name="allowedStatus" #if ($allowedStatus) value="$allowedStatus" #end size="70"/></span>
+					<div class="description">$i18n.getText("allowed.status.description")</div>
+				</div>
+				<div class="field-group">
+					<label>$i18n.getText("sync.prior.entities")</label>
+					<span class="field-value"><input type="checkbox" name="syncPriorEntities" value="Yes" #if($syncPriorEntities) checked #end/></span>
+					<div class="description">$i18n.getText("sync.prior.entities.description")</div>
+				</div>
+			</fieldset>
+			<hr>
+			#parse( "/templates/config/feedback_status_mapping.vm" )
+			<input type="hidden" name="id" value="$id"/>
+			<div class="buttons-container form-footer">
+				<div class="buttons">
+					<input class="aui-button aui-button-primary" id="config_btn" class="button submit" type="button" value="$i18n.getText("configure.save")">
+					<a class="cancel" href="$requestContext.baseUrl/secure/admin/MapForums!default.jspa">$i18n.getText("configure.back")</a>
+				</div>
+			</div>
+		</form>
+		<script type="text/javascript">
+			AJS.$("#config_btn").click(function() {
+				var jsonString = AJS.$('#status-mapping tbody tr').map(function() {
+					var row = AJS.$(this);
+					var selectBoxName =row.find('td:eq(0)').text();
+					var jiraStatusName=AJS.$("select[name='" + selectBoxName +"']").find('option:selected').text();
+					return {
+						uvStatusId: row.find('td:eq(0)').attr('id'),
+					    uvStatus: row.find('td:eq(0)').text(),
+					    jiraStatusId: row.find('td:eq(1)').find('select').attr('value'),
+					    jiraStatus: jiraStatusName,
+					    id: row.attr('id')
+					  };
+					}).get();
+				AJS.$("#jsonFBSMapping").val(JSON.stringify(jsonString));
+				AJS.$("#fbMappingForm").submit();
+			});
+		</script>
+	</body>
+</html>         

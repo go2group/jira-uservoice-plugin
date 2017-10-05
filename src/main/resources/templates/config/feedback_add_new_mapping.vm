@@ -1,0 +1,26 @@
+						<table>
+						    <tbody>
+						        <tr>
+						            <td>Project</td>
+						            <td>
+						            	<select class="select" name="project" id="project">
+											#foreach($project in $projects)
+												<option value="$project.id">$project.name</option>
+											#end
+										</select>
+						            </td>
+						            <td>Forum</td>
+						            <td>
+						            	<select class="select" name="forum" id="forum">
+											#foreach($forum in $forums)
+												<option value="$forum.id">$forum.name</option>
+											#end
+										</select>
+						            </td>
+						            <td>
+										<span class="aui-button" id="addMapping">Add</span>
+									</span>
+						            </td>
+						        </tr>
+						    </tbody>
+						</table>
